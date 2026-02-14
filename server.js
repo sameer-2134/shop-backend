@@ -18,8 +18,9 @@ const server = http.createServer(app);
 
 socketInstance.init(server);
 
+
 app.use(cors({
-    origin: "http://localhost:5173", 
+    origin: ["http://localhost:5173", "https://your-frontend-link.vercel.app"], // Apne frontend ka Vercel link yahan daal dena
     credentials: true 
 })); 
 
@@ -33,6 +34,7 @@ if (!fs.existsSync(uploadsPath)) {
 
 app.use('/uploads', express.static(uploadsPath));
 
+// ✅ DATABASE CONNECTION: Ye bilkul sahi hai
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected Successfully"))
   .catch(err => console.log("❌ MongoDB Connection Error:", err));
@@ -54,7 +56,7 @@ app.get("/", (req, res) => {
     res.send("ShopLane API & Real-time Sockets are working! 🚀")
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080; 
 server.listen(PORT, () => {
     console.log(`🚀 Server Live on Port: ${PORT} 🔥`);
 });
