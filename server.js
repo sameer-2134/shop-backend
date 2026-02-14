@@ -63,7 +63,10 @@ app.get("/", (req, res) => {
     res.send("ShopLane API & Real-time Sockets are working! 🚀")
 });
 
+
 const PORT = process.env.PORT || 8080; 
-server.listen(PORT, () => {
+
+// "0.0.0.0" likhne se Railway isse externally access karne dega
+server.listen(PORT, "0.0.0.0", () => {
     console.log(`🚀 Server Live on Port: ${PORT} 🔥`);
 });
