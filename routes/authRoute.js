@@ -10,7 +10,7 @@ const {
     updateProfile, 
     logout,
     getMe 
-} = require('../controllers/authController'); // Check kar lena path sahi ho
+} = require('../controllers/authcontroller'); // Check kar lena path sahi ho
 
 /**
  * @route   POST /api/auth/register
