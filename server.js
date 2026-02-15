@@ -24,14 +24,24 @@ socketInstance.init(server);
 
 // ✅ CORS CONFIG
 app.use(cors({
-    origin: [
-        "http://localhost:5173", 
-        "https://shop-frontend-six-pi.vercel.app",
-        /\.vercel\.app$/ 
-    ],
-    credentials: true 
-})); 
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl)
+        if (!origin) return callback(null, true);
+        
+        const allowedOrigins = [
+            "http://localhost:5173",
+            "https://shop-frontend-six-pi.vercel.app"
+        ];
 
+        // Check if origin is in allowedOrigins OR matches any .vercel.app subdomain
+        if (allowedOrigins.indexOf(origin) !== -1 || /\.vercel\.app$/.test(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true 
+}));
 app.use(express.json());
 app.use(cookieParser());
 
