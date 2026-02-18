@@ -11,10 +11,8 @@ const userSchema = new mongoose.Schema({
         unique: true,
         lowercase: true // Email hamesha small letters mein save hoga
     },
-    password: { 
-        type: String, 
-        required: true 
-    },
+ password: { type: String, required: true, select: false },
+
     phone: { 
         type: String, 
         default: "" 

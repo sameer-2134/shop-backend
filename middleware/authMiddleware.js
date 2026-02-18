@@ -8,10 +8,9 @@ const protect = (req, res, next) => {
             token = token.split(" ")[1]; 
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             
-            // ✅ ID ke saath EMAIL bhi add kar do taaki Controller mein email mil sake
             req.user = { 
                 id: decoded.id,
-                email: decoded.email // Ensure karo ki tumhare JWT payload mein email hai
+                email: decoded.email 
             }; 
             
             next();
