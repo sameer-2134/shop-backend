@@ -7,6 +7,7 @@ const axios = require('axios');
 
 let otpStore = {}; 
 
+<<<<<<< HEAD
 const transporter = nodemailer.createTransport({
     host: 'smtp.ethereal.email',
     port: 587,
@@ -16,24 +17,49 @@ const transporter = nodemailer.createTransport({
     }
 });
 // --- Helper: Token & Cookie Response ---
+=======
+// --- Transporter Configuration ---
+const transporter = nodemailer.createTransport({
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false, 
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false 
+    }
+});
+
+
+>>>>>>> a34d9d0
 const sendTokenResponse = (user, statusCode, res, message) => {
     const token = jwt.sign(
-        { id: user._id, role: user.role }, 
+        { id: user._id, role: user.role, email: user.email }, 
         process.env.JWT_SECRET, 
-        { expiresIn: '24h' }
+        { expiresIn: '7d' } 
     );
+
+    const isProduction = process.env.NODE_ENV === 'production';
 
     const cookieOptions = {
         httpOnly: true, 
+<<<<<<< HEAD
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         maxAge: 24 * 60 * 60 * 1000 
+=======
+        secure: isProduction, 
+        sameSite: isProduction ? 'none' : 'lax', 
+        maxAge: 7 * 24 * 60 * 60 * 1000 
+>>>>>>> a34d9d0
     };
 
     res.status(statusCode).cookie('token', token, cookieOptions).json({
         success: true,
         message,
-        token, 
+        token,
         user: { 
             id: user._id, 
             name: user.name, 
@@ -45,7 +71,10 @@ const sendTokenResponse = (user, statusCode, res, message) => {
     });
 };
 
+<<<<<<< HEAD
 // --- GOOGLE LOGIN ---
+=======
+>>>>>>> a34d9d0
 const googleLogin = async (req, res) => {
     try {
         const { token } = req.body; 
@@ -75,12 +104,18 @@ const googleLogin = async (req, res) => {
     }
 };
 
+<<<<<<< HEAD
 // --- REGISTER ---
 const register = async (req, res) => {
     try {
         const { name, email, password, phone } = req.body;
         if (!name || !email || !password) return res.status(400).json({ success: false, message: "Details missing hain!" });
 
+=======
+const register = async (req, res) => {
+    try {
+        const { name, email, password, phone } = req.body;
+>>>>>>> a34d9d0
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ success: false, message: "User already exists!" });
 
@@ -94,6 +129,7 @@ const register = async (req, res) => {
     }
 };
 
+<<<<<<< HEAD
 // --- LOGIN ---
 const login = async (req, res) => {
     try {
@@ -104,13 +140,44 @@ const login = async (req, res) => {
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).json({ success: false, message: "Invalid credentials!" });
         }
+=======
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email }).select('+password');
+        
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({ success: false, message: "Invalid credentials!" });
+        }
+
+>>>>>>> a34d9d0
         sendTokenResponse(user, 200, res, `Vapas swagat hai, ${user.name}!`);
     } catch (error) {
-        res.status(500).json({ success: false, message: "Server error during login." });
+        res.status(500).json({ success: false, message: "Server error" });
     }
 };
 
+<<<<<<< HEAD
 // --- NEW: SEND OTP LOGIN (Missing tha) ---
+=======
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.user?.id; 
+        const { name, phone } = req.body;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId, 
+            { name, phone }, 
+            { new: true }
+        ).select('-password');
+
+        res.json({ success: true, user: updatedUser });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Profile update fail ho gaya." });
+    }
+};
+
+>>>>>>> a34d9d0
 const sendOTPLogin = async (req, res) => {
     const { email } = req.body;
     try {
@@ -124,21 +191,31 @@ const sendOTPLogin = async (req, res) => {
             from: `"ShopLane Security" <${process.env.EMAIL_USER}>`,
             to: email,
             subject: `Verification Code: ${otp}`,
+<<<<<<< HEAD
             html: `<div style="font-family:sans-serif; padding:20px; border:1px solid #eee; border-radius:10px;">
                     <h2>ShopLane Verification</h2>
                     <p>Your OTP for login is: <b style="font-size:24px;">${otp}</b></p>
                     <p>Valid for 5 minutes.</p>
                    </div>`
+=======
+            html: `<h2>ShopLane Verification</h2><p>Your OTP for login is: <b>${otp}</b></p>`
+>>>>>>> a34d9d0
         });
 
         res.status(200).json({ success: true, message: "OTP bhej diya gaya hai!" });
     } catch (error) {
+<<<<<<< HEAD
         console.error(error);
+=======
+>>>>>>> a34d9d0
         res.status(500).json({ success: false, message: "Email service down hai." });
     }
 };
 
+<<<<<<< HEAD
 // --- NEW: VERIFY OTP LOGIN (Missing tha) ---
+=======
+>>>>>>> a34d9d0
 const verifyOTPLogin = async (req, res) => {
     const { email, otp } = req.body;
     try {
@@ -146,7 +223,10 @@ const verifyOTPLogin = async (req, res) => {
         if (!storedData || storedData.code !== otp.toString() || Date.now() > storedData.expiresAt) {
             return res.status(400).json({ success: false, message: "Invalid or expired OTP!" });
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> a34d9d0
         const user = await User.findOne({ email });
         delete otpStore[email];
         sendTokenResponse(user, 200, res, `Swagat hai, ${user.name}!`);
@@ -155,7 +235,10 @@ const verifyOTPLogin = async (req, res) => {
     }
 };
 
+<<<<<<< HEAD
 // --- FORGOT PASSWORD ---
+=======
+>>>>>>> a34d9d0
 const forgotPassword = async (req, res) => {
     const { email } = req.body;
     try {
@@ -168,7 +251,11 @@ const forgotPassword = async (req, res) => {
         await transporter.sendMail({
             from: `"ShopLane Atelier" <${process.env.EMAIL_USER}>`,
             to: email,
+<<<<<<< HEAD
             subject: `🔐 Reset Your Password - ${otp}`,
+=======
+            subject: `🔐 Reset Code: ${otp}`,
+>>>>>>> a34d9d0
             html: `<h3>Password Reset Code: ${otp}</h3>`
         });
 
@@ -178,13 +265,20 @@ const forgotPassword = async (req, res) => {
     }
 };
 
+<<<<<<< HEAD
 // --- RESET PASSWORD ---
+=======
+>>>>>>> a34d9d0
 const resetPassword = async (req, res) => {
     const { email, otp, newPassword } = req.body;
     try {
         const storedData = otpStore[email];
         if (!storedData || storedData.code !== otp.toString() || Date.now() > storedData.expiresAt) {
+<<<<<<< HEAD
             return res.status(400).json({ success: false, message: "Invalid/Expired OTP!" });
+=======
+            return res.status(400).json({ success: false, message: "Invalid or expired OTP!" });
+>>>>>>> a34d9d0
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -198,6 +292,7 @@ const resetPassword = async (req, res) => {
     }
 };
 
+<<<<<<< HEAD
 const updateProfile = async (req, res) => {
     try {
        
@@ -221,6 +316,8 @@ const updateProfile = async (req, res) => {
     }
 };
 
+=======
+>>>>>>> a34d9d0
 const logout = (req, res) => {
     res.clearCookie('token');
     res.json({ success: true, message: "Logged out! 👋" });
@@ -235,6 +332,10 @@ const getMe = async (req, res) => {
     }
 };
 
+<<<<<<< HEAD
+=======
+// --- MODULE EXPORTS ---
+>>>>>>> a34d9d0
 module.exports = {
     googleLogin,
     register,
@@ -244,6 +345,11 @@ module.exports = {
     updateProfile,
     logout,
     getMe,
+<<<<<<< HEAD
     sendOTPLogin,  
     verifyOTPLogin  
+=======
+    sendOTPLogin,
+    verifyOTPLogin
+>>>>>>> a34d9d0
 };

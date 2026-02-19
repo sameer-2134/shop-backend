@@ -10,6 +10,11 @@ router.post('/forgot-password', authController.forgotPassword);
 router.post('/reset-password', authController.resetPassword);
 router.post('/send-otp-login', authController.sendOTPLogin);
 router.post('/verify-otp-login', authController.verifyOTPLogin);
+<<<<<<< HEAD
+
+router.put('/update-profile', protect, authController.updateProfile);
+router.get('/me', protect, authController.getMe);
+router.get('/logout', authController.logout);
 
 router.put('/update-profile', protect, authController.updateProfile);
 router.get('/me', protect, authController.getMe);

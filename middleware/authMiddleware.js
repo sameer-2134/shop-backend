@@ -6,6 +6,7 @@ const protect = (req, res, next) => {
     if (token && token.startsWith("Bearer")) {
         try {
             token = token.split(" ")[1]; 
+            
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             
             req.user = { 
@@ -15,11 +16,17 @@ const protect = (req, res, next) => {
             
             next();
         } catch (error) {
-            console.error("Token verification failed:", error);
-            res.status(401).json({ message: "Not authorized, token failed" });
+            res.status(401).json({ 
+                success: false, 
+                message: "Not authorized, token failed",
+                error: error.message 
+            });
         }
     } else {
-        res.status(401).json({ message: "No token, not authorized" });
+        res.status(401).json({ 
+            success: false, 
+            message: "No token, not authorized" 
+        });
     }
 };
 
